@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comunidade Ciclos Liderança — Inscrição</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light; }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <header class="max-w-3xl mx-auto px-4 pt-10 pb-6">
+    <h1 class="text-3xl font-black tracking-tight">Comunidade Ciclos Liderança</h1>
+    <p class="text-slate-600 mt-2">Preencha o formulário para manifestar interesse. Ao enviar, você verá a confirmação na tela e o registro será salvo.</p>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 pb-24">
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+      <h2 class="text-xl font-bold mb-4">Formulário de Interesse</h2>
+
+      <form id="membership-form" class="space-y-5">
+        <div class="grid md:grid-cols-2 gap-4">
+          <label class="block">
+            <span class="block text-sm font-medium text-slate-700">Nome completo *</span>
+            <input type="text" name="name" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500" placeholder="Seu nome" />
+          </label>
+
+          <label class="block">
+            <span class="block text-sm font-medium text-slate-700">Área de atuação *</span>
+            <input type="text" name="area" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500" placeholder="Ex.: Comercial, Operações, Produto..." />
+          </label>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <label class="block">
+            <span class="block text-sm font-medium text-slate-700">Cargo *</span>
+            <input type="text" name="role" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500" placeholder="Ex.: Diretora Comercial" />
+          </label>
+
+          <label class="block">
+            <span class="block text-sm font-medium text-slate-700">Empresa *</span>
+            <input type="text" name="company" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500" placeholder="Ex.: NeoSolar" />
+          </label>
+        </div>
+
+        <label class="block">
+          <span class="block text-sm font-medium text-slate-700">Como você gostaria de colaborar? *</span>
+          <select name="collaboration" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500">
+            <option value="" selected disabled>Selecione uma opção</option>
+            <option value="Participar dos encontros">Participar dos encontros</option>
+            <option value="Mentoria/Voluntariado">Mentoria/Voluntariado</option>
+            <option value="Parcerias/Patrocínio">Parcerias/Patrocínio</option>
+            <option value="Quero saber mais">Quero saber mais</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </label>
+
+        <label class="block">
+          <span class="block text-sm font-medium text-slate-700">Por que quer participar? *</span>
+          <textarea name="reason" required rows="5" class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500" placeholder="Conte um pouco do seu interesse..."></textarea>
+        </label>
+
+        <div class="flex items-center justify-between gap-3 pt-2">
+          <p id="form-hint" class="text-xs text-slate-500">Campos marcados com * são obrigatórios.</p>
+          <button id="submit-btn" type="submit" class="rounded-xl px-5 py-2.5 bg-slate-900 text-white font-medium hover:bg-slate-800 active:bg-slate-950 disabled:opacity-60 disabled:cursor-not-allowed">
+            Enviar
+          </button>
+        </div>
+
+        <div id="form-error" class="hidden mt-4 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 p-3 text-sm"></div>
+      </form>
+    </section>
+  </main>
+
+  <!-- Modal de sucesso -->
+  <div id="success-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white max-w-md w-full rounded-2xl p-6 shadow-lg border border-slate-200">
+      <h3 class="text-xl font-bold">Inscrição enviada! 🎉</h3>
+      <p class="mt-2 text-slate-600">Recebemos seus dados com sucesso. Em breve entraremos em contato.</p>
+      <div class="mt-6 flex justify-end">
+        <button id="close-modal" class="rounded-xl px-4 py-2 border border-slate-300 hover:bg-slate-50">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // URL do Apps Script publicada como Web App
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxGTEEcRFu97Sllh_3bHD0wQvJwfwIzerJmBJMuwhuDR5AgYuqSIc6k4OaYluMap4nf/exec';
+
+    const form = document.getElementById('membership-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const errorBox = document.getElementById('form-error');
+    const successModal = document.getElementById('success-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+
+    function showError(message) {
+      errorBox.textContent = message || 'Não foi possível enviar agora. Tente novamente em instantes.';
+      errorBox.classList.remove('hidden');
+    }
+    function clearError() {
+      errorBox.classList.add('hidden');
+      errorBox.textContent = '';
+    }
+    function openModal() {
+      successModal.classList.remove('hidden');
+      successModal.classList.add('flex');
+    }
+    function closeModal() {
+      successModal.classList.add('hidden');
+      successModal.classList.remove('flex');
+    }
+    closeModalBtn.addEventListener('click', closeModal);
+    successModal.addEventListener('click', (e) => {
+      if (e.target === successModal) closeModal();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+
+      const formData = new FormData(form);
+      const payload = {
+        name: formData.get('name')?.toString().trim(),
+        area: formData.get('area')?.toString().trim(),
+        role: formData.get('role')?.toString().trim(),
+        company: formData.get('company')?.toString().trim(),
+        collaboration: formData.get('collaboration')?.toString(),
+        reason: formData.get('reason')?.toString().trim(),
+      };
+
+      // Validação simples de required (além do HTML5)
+      const required = ['name', 'area', 'role', 'company', 'collaboration', 'reason'];
+      for (const key of required) {
+        if (!payload[key] || payload[key].length === 0) {
+          showError('Preencha todos os campos obrigatórios.');
+          return;
+        }
+      }
+
+      submitBtn.disabled = true;
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch(scriptURL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8'
+          },
+          body: JSON.stringify(payload),
+        });
+
+        // Tenta ler JSON; se der erro, mostra mensagem genérica
+        let data = null;
+        try {
+          data = await res.json();
+        } catch (_) {
+          // ignora, pode ser texto/HTML
+        }
+
+        if (!res.ok || (data && data.result && data.result !== 'success')) {
+          const msg = (data && (data.error || data.message)) || `Erro ${res.status}: falha ao enviar.`;
+          showError(msg);
+        } else {
+          form.reset();
+          openModal();
+        }
+      } catch (err) {
+        showError('Falha de conexão. Verifique sua internet e tente novamente.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+  </script>
+</body>
+</html>
