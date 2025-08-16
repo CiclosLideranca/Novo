@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comunidade Ciclos Liderança | Seja Fundador</title>
+    <title>Comunidade Ciclos Liderança | Seja Membro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,7 +56,7 @@
                 Vamos criar juntos um ecossistema de apoio mútuo para líderes que buscam crescimento, partilha e conexão genuína. Chegou a hora de quebrar o ciclo da solidão na liderança.
             </p>
             <a href="#form-section" class="mt-10 px-8 py-4 bg-violet-600 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-violet-700 transition-transform transform hover:scale-105">
-                Candidate-se a Membro Fundador
+                Gostaria de se tornar um mebro?
             </a>
         </section>
 
@@ -104,9 +104,9 @@
         
         <section id="form-section" class="py-16 md:py-24">
              <div class="text-center max-w-3xl mx-auto">
-                <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Aplicação para <span class="text-violet-600">Membro Fundador</span></h2>
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Aplicação para <span class="text-violet-600">Membro</span></h2>
                 <p class="mt-4 text-lg text-slate-600">
-                    Se você quer ser um dos pioneiros com acesso gratuito e vitalício, preencha o formulário abaixo. As vagas são limitadas e a seleção será criteriosa.
+                    Se você quer ser um dos pioneiros, preencha o formulário abaixo. As vagas são limitadas. E o Início está previsto para 15 de Setembro.
                 </p>
             </div>
 
@@ -249,12 +249,12 @@
                 <div id="thank-you-message" class="hidden text-center py-10">
                     <div class="text-6xl mb-4">🎉</div>
                     <h3 class="text-2xl font-bold text-slate-900">Candidatura Enviada!</h3>
-                    <p class="mt-4 text-lg text-slate-600">Obrigado pelo seu interesse! Recebemos os seus dados e analisaremos a sua candidatura para o grupo de fundadores. Entraremos em contacto em breve.</p>
+                    <p class="mt-4 text-lg text-slate-600">Obrigado pelo seu interesse! Recebemos os seus dados e analisaremos a sua candidatura. Entraremos em contacto em breve.</p>
                 </div>
                  <div id="not-leader-message" class="hidden text-center py-10">
                      <div class="text-6xl mb-4">🙏</div>
                     <h3 class="text-2xl font-bold text-slate-900">Agradecemos o seu interesse!</h3>
-                    <p class="mt-4 text-lg text-slate-600">No momento, a candidatura para Membro Fundador é exclusiva para líderes em exercício. Convidamo-lo a seguir a <strong>Ciclos de Impacto</strong> para ficar a par de futuras oportunidades.</p>
+                    <p class="mt-4 text-lg text-slate-600">No momento, a candidatura para Membro é exclusiva para líderes em exercício. Convidamo-lo a seguir a <strong>Ciclos_lideranca</strong> para ficar a par de futuras oportunidades.</p>
                 </div>
             </div>
         </section>
@@ -265,7 +265,7 @@
          <div class="inline-flex items-center gap-3 mb-4">
             <img src="img/Design sem nome.png" alt="Logo da Ciclos Liderança" class="w-20 h-auto">
         </div>
-        <p>&copy; 2025 Ciclos de Impacto. Todos os direitos reservados.</p>
+        <p>&copy; 2025 Ciclos Liderança. Todos os direitos reservados.</p>
     </footer>
 
     <script>
@@ -371,14 +371,20 @@
             e.preventDefault();
             if (!validateStep(currentStep)) return;
 
-            const scriptURL = 'COLE_O_SEU_NOVO_URL_DO_APPS_SCRIPT_AQUI'; // <-- COLE O SEU NOVO LINK AQUI
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyNx3uOvOfGPbt8pNUjHuQxHV023ol3tFcpYS8lsYXKu1Hnyd5zblhbN87kMJMAFSmy/exec';
             const submitButton = e.target.querySelector('button[type="submit"]');
             submitButton.disabled = true;
             submitButton.textContent = 'Enviando...';
 
             fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok, status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Success:', data);
                     if (data.result === 'success') {
                         form.parentElement.innerHTML = thankYouMessage.outerHTML;
                         thankYouMessage.classList.remove('hidden');
@@ -387,8 +393,8 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Error!', error.message);
-                    alert('Ocorreu um erro ao enviar a sua candidatura. Por favor, tente novamente.');
+                    console.error('Error during submission:', error);
+                    alert('Ocorreu um erro ao enviar a sua candidatura. Por favor, verifique a sua ligação e tente novamente. Se o erro persistir, contacte o suporte.');
                 })
                 .finally(() => {
                     submitButton.disabled = false;
