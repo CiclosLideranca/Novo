@@ -1,182 +1,403 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Comunidade Ciclos Liderança — Inscrição</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <style>
-    :root { color-scheme: light; }
-    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
-  </style>
-</head>
-<body class="bg-slate-50 text-slate-900">
-  <header class="max-w-3xl mx-auto px-4 pt-10 pb-6">
-    <h1 class="text-3xl font-black tracking-tight">Comunidade Ciclos Liderança</h1>
-    <p class="text-slate-600 mt-2">Preencha o formulário para manifestar interesse. Ao enviar, você verá a confirmação na tela e o registro será salvo.</p>
-  </header>
-
-  <main class="max-w-3xl mx-auto px-4 pb-24">
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
-      <h2 class="text-xl font-bold mb-4">Formulário de Interesse</h2>
-
-      <form id="membership-form" class="space-y-5">
-        <div class="grid md:grid-cols-2 gap-4">
-          <label class="block">
-            <span class="block text-sm font-medium text-slate-700">Nome completo *</span>
-            <input type="text" name="name" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500" placeholder="Seu nome" />
-          </label>
-
-          <label class="block">
-            <span class="block text-sm font-medium text-slate-700">Área de atuação *</span>
-            <input type="text" name="area" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500" placeholder="Ex.: Comercial, Operações, Produto..." />
-          </label>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-4">
-          <label class="block">
-            <span class="block text-sm font-medium text-slate-700">Cargo *</span>
-            <input type="text" name="role" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500" placeholder="Ex.: Diretora Comercial" />
-          </label>
-
-          <label class="block">
-            <span class="block text-sm font-medium text-slate-700">Empresa *</span>
-            <input type="text" name="company" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500" placeholder="Ex.: NeoSolar" />
-          </label>
-        </div>
-
-        <label class="block">
-          <span class="block text-sm font-medium text-slate-700">Como você gostaria de colaborar? *</span>
-          <select name="collaboration" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500">
-            <option value="" selected disabled>Selecione uma opção</option>
-            <option value="Participar dos encontros">Participar dos encontros</option>
-            <option value="Mentoria/Voluntariado">Mentoria/Voluntariado</option>
-            <option value="Parcerias/Patrocínio">Parcerias/Patrocínio</option>
-            <option value="Quero saber mais">Quero saber mais</option>
-            <option value="Outro">Outro</option>
-          </select>
-        </label>
-
-        <label class="block">
-          <span class="block text-sm font-medium text-slate-700">Por que quer participar? *</span>
-          <textarea name="reason" required rows="5" class="mt-1 w-full rounded-xl border-slate-300 focus:border-slate-500 focus:ring-slate-500" placeholder="Conte um pouco do seu interesse..."></textarea>
-        </label>
-
-        <div class="flex items-center justify-between gap-3 pt-2">
-          <p id="form-hint" class="text-xs text-slate-500">Campos marcados com * são obrigatórios.</p>
-          <button id="submit-btn" type="submit" class="rounded-xl px-5 py-2.5 bg-slate-900 text-white font-medium hover:bg-slate-800 active:bg-slate-950 disabled:opacity-60 disabled:cursor-not-allowed">
-            Enviar
-          </button>
-        </div>
-
-        <div id="form-error" class="hidden mt-4 rounded-lg border border-rose-200 bg-rose-50 text-rose-700 p-3 text-sm"></div>
-      </form>
-    </section>
-  </main>
-
-  <!-- Modal de sucesso -->
-  <div id="success-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-white max-w-md w-full rounded-2xl p-6 shadow-lg border border-slate-200">
-      <h3 class="text-xl font-bold">Inscrição enviada! 🎉</h3>
-      <p class="mt-2 text-slate-600">Recebemos seus dados com sucesso. Em breve entraremos em contato.</p>
-      <div class="mt-6 flex justify-end">
-        <button id="close-modal" class="rounded-xl px-4 py-2 border border-slate-300 hover:bg-slate-50">Fechar</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // URL do Apps Script publicada como Web App
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxGTEEcRFu97Sllh_3bHD0wQvJwfwIzerJmBJMuwhuDR5AgYuqSIc6k4OaYluMap4nf/exec';
-
-    const form = document.getElementById('membership-form');
-    const submitBtn = document.getElementById('submit-btn');
-    const errorBox = document.getElementById('form-error');
-    const successModal = document.getElementById('success-modal');
-    const closeModalBtn = document.getElementById('close-modal');
-
-    function showError(message) {
-      errorBox.textContent = message || 'Não foi possível enviar agora. Tente novamente em instantes.';
-      errorBox.classList.remove('hidden');
-    }
-    function clearError() {
-      errorBox.classList.add('hidden');
-      errorBox.textContent = '';
-    }
-    function openModal() {
-      successModal.classList.remove('hidden');
-      successModal.classList.add('flex');
-    }
-    function closeModal() {
-      successModal.classList.add('hidden');
-      successModal.classList.remove('flex');
-    }
-    closeModalBtn.addEventListener('click', closeModal);
-    successModal.addEventListener('click', (e) => {
-      if (e.target === successModal) closeModal();
-    });
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      clearError();
-
-      const formData = new FormData(form);
-      const payload = {
-        name: formData.get('name')?.toString().trim(),
-        area: formData.get('area')?.toString().trim(),
-        role: formData.get('role')?.toString().trim(),
-        company: formData.get('company')?.toString().trim(),
-        collaboration: formData.get('collaboration')?.toString(),
-        reason: formData.get('reason')?.toString().trim(),
-      };
-
-      // Validação simples de required (além do HTML5)
-      const required = ['name', 'area', 'role', 'company', 'collaboration', 'reason'];
-      for (const key of required) {
-        if (!payload[key] || payload[key].length === 0) {
-          showError('Preencha todos os campos obrigatórios.');
-          return;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunidade Ciclos Liderança | Seja Fundador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Ciclos Liderança (Violet, Rose, Amber) -->
+    <!-- Application Structure Plan: Reverted to the original concept. A single-page application structured as a conversion funnel for the "Founder Member" application. It starts with a Hero section, builds empathy with the 'pain' section, presents the 'solution', and culminates in a multi-step interactive form to maximize completion rates for the exclusive founder offer. -->
+    <!-- Visualization & Content Choices: The impactful doughnut chart visualizing the Korn Ferry statistic (72%) is retained. The primary interactive element is the multi-step application form, designed to reduce friction for a more detailed application process. The user's official logo is used for branding. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
         }
-      }
+        .form-step {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .form-step.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .range-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
 
-      submitBtn.disabled = true;
-      const originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Enviando...';
+    <header class="py-6 text-center">
+        <div class="inline-flex items-center gap-3">
+            <img src="img/Design sem nome.png" alt="Logo da Ciclos Liderança" class="w-16 h-auto">
+        </div>
+    </header>
 
-      try {
-        const res = await fetch(scriptURL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json;charset=UTF-8'
-          },
-          body: JSON.stringify(payload),
+    <main id="content" class="container mx-auto px-4 sm:px-6 lg:px-8">
+
+        <section id="hero" class="text-center min-h-[70vh] flex flex-col items-center justify-center py-20">
+            <h1 class="text-4xl md:text-6xl font-black text-slate-900 leading-tight">
+                Liderar <span class="text-violet-600">não precisa</span> ser um caminho solitário.
+            </h1>
+            <p class="mt-6 max-w-2xl text-lg md:text-xl text-slate-600">
+                Vamos criar juntos um ecossistema de apoio mútuo para líderes que buscam crescimento, partilha e conexão genuína. Chegou a hora de quebrar o ciclo da solidão na liderança.
+            </p>
+            <a href="#form-section" class="mt-10 px-8 py-4 bg-violet-600 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-violet-700 transition-transform transform hover:scale-105">
+                Candidate-se a Membro Fundador
+            </a>
+        </section>
+
+        <section id="problem" class="py-16 md:py-24">
+             <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900">O Paradoxo da Liderança</h2>
+                <p class="mt-4 text-lg text-slate-600">
+                    Não é apenas uma sensação, é um dado. Um estudo da consultoria global <strong class="text-slate-900">Korn Ferry</strong> descobriu que <strong class="text-slate-900">72% dos líderes sentem-se sozinhos</strong> e isolados nas suas funções. O isolamento no topo não é um mito, é um obstáculo real ao crescimento.
+                </p>
+            </div>
+            <div class="mt-12">
+                <div class="chart-container relative w-full max-w-sm mx-auto h-80 md:h-96">
+                    <canvas id="lonelinessChart"></canvas>
+                </div>
+                 <p class="text-center text-sm text-slate-500 mt-4">Fonte: Estudo da consultoria Korn Ferry.</p>
+            </div>
+        </section>
+
+        <section id="solution" class="py-16 md:py-24 bg-white rounded-2xl shadow-sm">
+             <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900">A Solução: <span class="text-violet-600">Comunidade Ciclos Liderança</span></h2>
+                <p class="mt-4 text-lg text-slate-600">
+                    Um espaço confidencial e seguro, desenhado por líderes, para líderes. Um lugar para partilhar vulnerabilidades, celebrar vitórias e acelerar o crescimento juntos, sem medo de julgamentos.
+                </p>
+            </div>
+
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div class="p-6">
+                    <div class="text-4xl">🛡️</div>
+                    <h3 class="mt-4 text-xl font-bold">Espaço Seguro</h3>
+                    <p class="mt-2 text-slate-600">Um ambiente de total confidencialidade para debater os seus desafios mais complexos.</p>
+                </div>
+                <div class="p-6">
+                    <div class="text-4xl">🤝</div>
+                    <h3 class="mt-4 text-xl font-bold">Hub de Trocas</h3>
+                    <p class="mt-2 text-slate-600">Colaboração na prática. Doe 1h/mês da sua expertise e receba 1h/mês de ajuda qualificada.</p>
+                </div>
+                <div class="p-6">
+                    <div class="text-4xl">🚀</div>
+                    <h3 class="mt-4 text-xl font-bold">Crescimento Acelerado</h3>
+                    <p class="mt-2 text-slate-600">Aprenda com as experiências, erros e acertos de um grupo de pares de alto nível.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="form-section" class="py-16 md:py-24">
+             <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Aplicação para <span class="text-violet-600">Membro Fundador</span></h2>
+                <p class="mt-4 text-lg text-slate-600">
+                    Se você quer ser um dos pioneiros com acesso gratuito e vitalício, preencha o formulário abaixo. As vagas são limitadas e a seleção será criteriosa.
+                </p>
+            </div>
+
+            <div id="application-form-container" class="mt-12 max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+                <div id="form-progress" class="w-full bg-slate-200 rounded-full h-2.5 mb-8">
+                    <div id="form-progress-bar" class="bg-violet-600 h-2.5 rounded-full" style="width: 25%"></div>
+                </div>
+                
+                <form id="multi-step-form">
+                    <div id="step1" class="form-step active">
+                        <h3 class="text-xl font-bold mb-1">O Seu Momento Atual</h3>
+                        <p class="text-slate-600 mb-6">O único pré-requisito é estar num cargo de liderança ativo.</p>
+                        
+                        <div class="mb-4">
+                            <label class="block text-slate-700 font-medium mb-2">1. Você está atualmente a exercer uma função de liderança?</label>
+                            <div class="flex flex-col space-y-2">
+                                <label class="p-4 border rounded-lg cursor-pointer hover:bg-slate-100 has-[:checked]:bg-violet-50 has-[:checked]:border-violet-500 transition-colors">
+                                    <input type="radio" name="is_leader" value="yes" class="sr-only" required>
+                                    <span>Sim, estou na liderança.</span>
+                                </label>
+                                <label class="p-4 border rounded-lg cursor-pointer hover:bg-slate-100 has-[:checked]:bg-red-50 has-[:checked]:border-red-500 transition-colors">
+                                    <input type="radio" name="is_leader" value="no" class="sr-only">
+                                    <span>Não, ainda não ocupo um cargo de liderança.</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="title" class="block text-slate-700 font-medium mb-2">2. Qual o seu título/cargo de liderança?</label>
+                            <input type="text" id="title" name="title" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition" placeholder="Ex: Gerente de Vendas, Coordenador de Marketing..." required>
+                        </div>
+                        
+                        <div class="flex justify-end mt-8">
+                            <button type="button" onclick="nextStep()" class="px-6 py-3 bg-violet-600 text-white font-bold rounded-lg hover:bg-violet-700 transition">Avançar</button>
+                        </div>
+                    </div>
+
+                    <div id="step2" class="form-step">
+                        <h3 class="text-xl font-bold mb-1">A Necessidade de Conexão</h3>
+                        <p class="text-slate-600 mb-6">Queremos entender as suas dores para melhor o ajudar.</p>
+                        
+                        <div class="mb-6">
+                            <label for="loneliness_scale" class="block text-slate-700 font-medium mb-2">3. Honestamente, com que frequência você se sente sozinho(a) nos seus desafios? <span id="loneliness_value" class="font-bold text-violet-600 ml-2">5</span></label>
+                            <span class="text-xs text-slate-500">0 (Nunca) a 10 (Constantemente)</span>
+                            <input type="range" id="loneliness_scale" name="loneliness_scale" min="0" max="10" value="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer range-slider-thumb bg-violet-600">
+                        </div>
+
+                         <div class="mb-4">
+                            <label class="block text-slate-700 font-medium mb-2">4. A perspetiva de ter um grupo de pares confiável para debater ideias e desafios te anima?</label>
+                            <div class="flex flex-col space-y-2">
+                                <label class="p-4 border rounded-lg cursor-pointer hover:bg-slate-100 has-[:checked]:bg-violet-50 has-[:checked]:border-violet-500 transition-colors">
+                                    <input type="radio" name="interest_level" value="high" class="sr-only" required>
+                                    <span>Sim, imensamente.</span>
+                                </label>
+                                <label class="p-4 border rounded-lg cursor-pointer hover:bg-slate-100 has-[:checked]:bg-violet-50 has-[:checked]:border-violet-500 transition-colors">
+                                    <input type="radio" name="interest_level" value="medium" class="sr-only">
+                                    <span>Sim, parece interessante.</span>
+                                </label>
+                                <label class="p-4 border rounded-lg cursor-pointer hover:bg-slate-100 has-[:checked]:bg-violet-50 has-[:checked]:border-violet-500 transition-colors">
+                                    <input type="radio" name="interest_level" value="low" class="sr-only">
+                                    <span>Talvez, preciso entender melhor a dinâmica.</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between mt-8">
+                            <button type="button" onclick="prevStep()" class="px-6 py-3 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition">Voltar</button>
+                            <button type="button" onclick="nextStep()" class="px-6 py-3 bg-violet-600 text-white font-bold rounded-lg hover:bg-violet-700 transition">Avançar</button>
+                        </div>
+                    </div>
+
+                    <div id="step3" class="form-step">
+                        <h3 class="text-xl font-bold mb-1">O Hub de Trocas</h3>
+                        <p class="text-slate-600 mb-6">Acreditamos que a colaboração é a nova competição.</p>
+
+                        <div class="mb-4">
+                             <label class="block text-slate-700 font-medium mb-2">5. Você topa entrar neste ciclo de troca, doando e recebendo conhecimento para fortalecer todo o grupo?</label>
+                            <div class="flex flex-col space-y-2">
+                                <label class="p-4 border rounded-lg cursor-pointer hover:bg-slate-100 has-[:checked]:bg-violet-50 has-[:checked]:border-violet-500 transition-colors">
+                                    <input type="radio" name="hub_participation" value="yes_love_it" class="sr-only" required>
+                                    <span>Sim, adorei a ideia!</span>
+                                </label>
+                                <label class="p-4 border rounded-lg cursor-pointer hover:bg-slate-100 has-[:checked]:bg-violet-50 has-[:checked]:border-violet-500 transition-colors">
+                                    <input type="radio" name="hub_participation" value="yes" class="sr-only">
+                                    <span>Sim, estou dentro.</span>
+                                </label>
+                                <label class="p-4 border rounded-lg cursor-pointer hover:bg-slate-100 has-[:checked]:bg-violet-50 has-[:checked]:border-violet-500 transition-colors">
+                                    <input type="radio" name="hub_participation" value="maybe" class="sr-only">
+                                    <span>Tenho interesse, mas gostaria de mais detalhes.</span>
+                                </label>
+                                 <label class="p-4 border rounded-lg cursor-pointer hover:bg-slate-100 has-[:checked]:bg-red-50 has-[:checked]:border-red-500 transition-colors">
+                                    <input type="radio" name="hub_participation" value="no" class="sr-only">
+                                    <span>Prefiro não participar deste modelo.</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="expertise" class="block text-slate-700 font-medium mb-2">6. Se você fosse partilhar o seu "superpoder" profissional por uma hora, qual seria?</label>
+                            <input type="text" id="expertise" name="expertise" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition" placeholder="Ex: Gestão de Pessoas, Oratória, Vendas B2B..." required>
+                        </div>
+
+                        <div class="flex justify-between mt-8">
+                            <button type="button" onclick="prevStep()" class="px-6 py-3 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition">Voltar</button>
+                            <button type="button" onclick="nextStep()" class="px-6 py-3 bg-violet-600 text-white font-bold rounded-lg hover:bg-violet-700 transition">Avançar</button>
+                        </div>
+                    </div>
+
+                    <div id="step4" class="form-step">
+                        <h3 class="text-xl font-bold mb-1">Os Seus Contactos</h3>
+                        <p class="text-slate-600 mb-6">Falta pouco! Estes dados são confidenciais e serão usados apenas para o convite.</p>
+                        
+                        <div class="mb-4">
+                            <label for="name" class="block text-slate-700 font-medium mb-2">7. O seu Nome e Apelido:</label>
+                            <input type="text" id="name" name="name" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition" placeholder="Seu nome completo" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="email" class="block text-slate-700 font-medium mb-2">8. O seu melhor E-mail:</label>
+                            <input type="email" id="email" name="email" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition" placeholder="seu.email@exemplo.com" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="whatsapp" class="block text-slate-700 font-medium mb-2">9. O seu WhatsApp (com indicativo + código de área):</label>
+                            <input type="tel" id="whatsapp" name="whatsapp" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition" placeholder="+55 11 91234-5678" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="linkedin" class="block text-slate-700 font-medium mb-2">10. O seu perfil no LinkedIn:</label>
+                            <input type="url" id="linkedin" name="linkedin" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition" placeholder="https://linkedin.com/in/seu-perfil" required>
+                        </div>
+
+                        <div class="flex justify-between mt-8">
+                            <button type="button" onclick="prevStep()" class="px-6 py-3 bg-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-300 transition">Voltar</button>
+                            <button type="submit" class="px-8 py-3 bg-violet-600 text-white font-bold rounded-lg hover:bg-violet-700 transition">Enviar Candidatura</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="thank-you-message" class="hidden text-center py-10">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h3 class="text-2xl font-bold text-slate-900">Candidatura Enviada!</h3>
+                    <p class="mt-4 text-lg text-slate-600">Obrigado pelo seu interesse! Recebemos os seus dados e analisaremos a sua candidatura para o grupo de fundadores. Entraremos em contacto em breve.</p>
+                </div>
+                 <div id="not-leader-message" class="hidden text-center py-10">
+                     <div class="text-6xl mb-4">🙏</div>
+                    <h3 class="text-2xl font-bold text-slate-900">Agradecemos o seu interesse!</h3>
+                    <p class="mt-4 text-lg text-slate-600">No momento, a candidatura para Membro Fundador é exclusiva para líderes em exercício. Convidamo-lo a seguir a <strong>Ciclos de Impacto</strong> para ficar a par de futuras oportunidades.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-slate-400 text-center p-8 mt-16">
+         <div class="inline-flex items-center gap-3 mb-4">
+            <img src="img/Design sem nome.png" alt="Logo da Ciclos Liderança" class="w-20 h-auto">
+        </div>
+        <p>&copy; 2025 Ciclos de Impacto. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        const lonelinessChartCtx = document.getElementById('lonelinessChart').getContext('2d');
+        
+        const centerTextPlugin = {
+            id: 'centerText',
+            afterDraw: (chart) => {
+                const { ctx } = chart;
+                const text = '72%';
+                const x = chart.getDatasetMeta(0).data[0].x;
+                const y = chart.getDatasetMeta(0).data[0].y;
+                
+                ctx.save();
+                ctx.font = 'bold 3rem Inter, sans-serif';
+                ctx.fillStyle = '#1e293b';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, x, y);
+                ctx.restore();
+            }
+        };
+
+        const lonelinessChart = new Chart(lonelinessChartCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Líderes que relatam solidão', 'Outros Líderes'],
+                datasets: [{
+                    label: '% de Líderes',
+                    data: [72, 28],
+                    backgroundColor: ['#7c3aed', '#e2e8f0'],
+                    borderColor: ['#7c3aed', '#e2e8f0'],
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { padding: 20, font: { size: 14 } } },
+                    tooltip: { callbacks: { label: (context) => ` ${context.label}: ${context.raw}%` } }
+                }
+            },
+            plugins: [centerTextPlugin]
         });
 
-        // Tenta ler JSON; se der erro, mostra mensagem genérica
-        let data = null;
-        try {
-          data = await res.json();
-        } catch (_) {
-          // ignora, pode ser texto/HTML
+        let currentStep = 1;
+        const formSteps = document.querySelectorAll('.form-step');
+        const progressBar = document.getElementById('form-progress-bar');
+        const form = document.getElementById('multi-step-form');
+        const thankYouMessage = document.getElementById('thank-you-message');
+        const notLeaderMessage = document.getElementById('not-leader-message');
+
+        function showStep(step) {
+            formSteps.forEach(el => el.classList.remove('active'));
+            document.getElementById(`step${step}`).classList.add('active');
+            progressBar.style.width = `${(step / formSteps.length) * 100}%`;
         }
 
-        if (!res.ok || (data && data.result && data.result !== 'success')) {
-          const msg = (data && (data.error || data.message)) || `Erro ${res.status}: falha ao enviar.`;
-          showError(msg);
-        } else {
-          form.reset();
-          openModal();
+        function nextStep() {
+            if (validateStep(currentStep)) {
+                if (currentStep < formSteps.length) {
+                    const isLeaderRadio = document.querySelector('input[name="is_leader"]:checked');
+                    if(currentStep === 1 && isLeaderRadio && isLeaderRadio.value === 'no') {
+                        form.parentElement.innerHTML = notLeaderMessage.outerHTML;
+                        notLeaderMessage.classList.remove('hidden');
+                        return;
+                    }
+                    currentStep++;
+                    showStep(currentStep);
+                }
+            }
         }
-      } catch (err) {
-        showError('Falha de conexão. Verifique sua internet e tente novamente.');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-      }
-    });
-  </script>
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+        
+        function validateStep(step) {
+            const currentStepElement = document.getElementById(`step${step}`);
+            const inputs = currentStepElement.querySelectorAll('input[required], select[required], textarea[required]');
+            let isValid = true;
+            inputs.forEach(input => {
+                const groupName = input.name;
+                if ((input.type === 'radio' || input.type === 'checkbox') && !document.querySelector(`input[name="${groupName}"]:checked`)) {
+                    isValid = false;
+                } else if (!input.value.trim()) {
+                    isValid = false;
+                    input.classList.add('border-red-500');
+                } else {
+                     input.classList.remove('border-red-500');
+                }
+            });
+            return isValid;
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!validateStep(currentStep)) return;
+
+            const scriptURL = 'COLE_O_SEU_NOVO_URL_DO_APPS_SCRIPT_AQUI'; // <-- COLE O SEU NOVO LINK AQUI
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Enviando...';
+
+            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result === 'success') {
+                        form.parentElement.innerHTML = thankYouMessage.outerHTML;
+                        thankYouMessage.classList.remove('hidden');
+                    } else {
+                        throw new Error(data.error || 'Unknown script error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    alert('Ocorreu um erro ao enviar a sua candidatura. Por favor, tente novamente.');
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Enviar Candidatura';
+                });
+        });
+
+        window.onload = () => { showStep(currentStep); };
+    </script>
+
 </body>
 </html>
